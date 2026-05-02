@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>b-side v2.20</title>
+<title>b-side</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -320,7 +320,7 @@ textarea {
 }
 
 .museum-title {
-  font-size: 0.78rem;
+  font-size: 0.9rem;
   letter-spacing: 0.35em;
   color: var(--muted);
 }
@@ -687,7 +687,7 @@ textarea {
   <div class="museum-list" id="museumList"></div>
 </div>
 
-<span class="version">v2.20</span>
+<span class="version">v2.18</span>
 
 <script>
 const MUSEUM_KEY = 'bside_museum';
@@ -938,7 +938,7 @@ document.getElementById('btnRelease').addEventListener('click', () => {
   }, 1800);
 });
 
-document.getElementById('btnShare').addEventListener('click', () => {
+document.getElementById('btnShare').addEventListener('click', async () => {
   if (stillTimer) clearTimeout(stillTimer);
 
   const textToShare = currentDraft;
@@ -962,25 +962,35 @@ document.getElementById('btnShare').addEventListener('click', () => {
     document.getElementById('stillBtns').classList.add('visible');
   };
 
+  // navigator.shareが使えるか確認
   const canShare = navigator.share && typeof navigator.share === 'function';
 
   if (canShare) {
-    navigator.share({ text: textToShare })
-      .then(() => { doSaveAndLeave(); })
-      .catch((e) => {
-        if (e.name === 'AbortError') {
+    try {
+      await navigator.share({ text: textToShare });
+      doSaveAndLeave();
+    } catch (e) {
+      if (e.name === 'AbortError') {
+        // ユーザーがキャンセル——Stillnessに留まる
+        doStay();
+      } else {
+        // その他のエラー——クリップボードにフォールバック
+        try {
+          await navigator.clipboard.writeText(textToShare);
+          doSaveAndLeave();
+        } catch {
           doStay();
-        } else {
-          // クリップボードにフォールバック
-          navigator.clipboard.writeText(textToShare)
-            .then(() => { doSaveAndLeave(); })
-            .catch(() => { doStay(); });
         }
-      });
+      }
+    }
   } else {
-    navigator.clipboard.writeText(textToShare)
-      .then(() => { doSaveAndLeave(); })
-      .catch(() => { doStay(); });
+    // 非対応——クリップボードにコピー
+    try {
+      await navigator.clipboard.writeText(textToShare);
+      doSaveAndLeave();
+    } catch {
+      doStay();
+    }
   }
 });
 
@@ -1021,7 +1031,7 @@ function renderMuseum() {
     <div class="museum-item" id="mitem-${item.id}">
       <div class="museum-date">${item.date}</div>
       <div class="museum-text" id="mtext-${item.id}">${escapeHtml(item.text)}</div>
-      <button class="museum-release-btn" onclick="releaseMuseumItem(${item.id})">${LANG[currentLang].release}</button>
+      <button class="museum-release-btn" onclick="releaseMuseumItem(${item.id})">放つ</button>
     </div>
   `).join('');
 }
