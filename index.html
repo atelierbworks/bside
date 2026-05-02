@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>b-side v2.31</title>
+<title>b-side v2.27</title>
 <style>
 html {
   font-size: 18px;
@@ -51,7 +51,10 @@ body::before {
   max-width: 480px;
   min-height: 100dvh;
   padding: 3rem 2rem;
-  margin: 0 auto;
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .screen.active {
@@ -688,7 +691,7 @@ textarea {
   <div class="museum-list" id="museumList"></div>
 </div>
 
-<span class="version">v2.31</span>
+<span class="version">v2.27</span>
 
 <script>
 const MUSEUM_KEY = 'bside_museum';
@@ -829,7 +832,6 @@ document.getElementById('menuTerms').addEventListener('click', () => {
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  window.scrollTo(0, 0);
 }
 
 function loadMuseum() {
@@ -967,13 +969,8 @@ document.getElementById('btnShare').addEventListener('click', () => {
   const canShare = navigator.share && typeof navigator.share === 'function';
 
   if (canShare) {
-    let shared = false;
-    window.focus();
     navigator.share({ text: textToShare })
-      .then(() => {
-        shared = true;
-        doSaveAndLeave();
-      })
+      .then(() => { doSaveAndLeave(); })
       .catch((e) => {
         if (e.name === 'AbortError') {
           doStay();
@@ -984,10 +981,6 @@ document.getElementById('btnShare').addEventListener('click', () => {
             .catch(() => { doStay(); });
         }
       });
-    // シェアシートが即座に閉じた場合の保険
-    setTimeout(() => {
-      if (!shared) doStay();
-    }, 100);
   } else {
     navigator.clipboard.writeText(textToShare)
       .then(() => { doSaveAndLeave(); })
