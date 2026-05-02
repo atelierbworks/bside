@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>b-side v2.29</title>
+<title>b-side v2.30</title>
 <style>
 html {
   font-size: 18px;
@@ -688,7 +688,7 @@ textarea {
   <div class="museum-list" id="museumList"></div>
 </div>
 
-<span class="version">v2.29</span>
+<span class="version">v2.30</span>
 
 <script>
 const MUSEUM_KEY = 'bside_museum';
@@ -967,8 +967,12 @@ document.getElementById('btnShare').addEventListener('click', () => {
   const canShare = navigator.share && typeof navigator.share === 'function';
 
   if (canShare) {
+    let shared = false;
     navigator.share({ text: textToShare })
-      .then(() => { doSaveAndLeave(); })
+      .then(() => {
+        shared = true;
+        doSaveAndLeave();
+      })
       .catch((e) => {
         if (e.name === 'AbortError') {
           doStay();
@@ -979,6 +983,10 @@ document.getElementById('btnShare').addEventListener('click', () => {
             .catch(() => { doStay(); });
         }
       });
+    // シェアシートが即座に閉じた場合の保険
+    setTimeout(() => {
+      if (!shared) doStay();
+    }, 100);
   } else {
     navigator.clipboard.writeText(textToShare)
       .then(() => { doSaveAndLeave(); })
