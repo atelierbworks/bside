@@ -3,9 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>b-side v2.24</title>
+<title>b-side v2.25</title>
 <style>
-html { font-size: 18px; }
+html {
+  font-size: 18px;
+  touch-action: pan-y;
+  overscroll-behavior-x: none;
+}
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
@@ -688,7 +692,7 @@ textarea {
   <div class="museum-list" id="museumList"></div>
 </div>
 
-<span class="version">v2.24</span>
+<span class="version">v2.25</span>
 
 <script>
 const MUSEUM_KEY = 'bside_museum';
@@ -1064,6 +1068,12 @@ document.getElementById('btnMuseumBack').addEventListener('click', () => {
 // ── Init ──
 applyLang();
 initEntrance();
+
+// 左右フリックでブラウザが閉じるのを抑制
+history.pushState(null, '', location.href);
+window.addEventListener('popstate', () => {
+  history.pushState(null, '', location.href);
+});
 </script>
 </body>
 </html>
