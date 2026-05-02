@@ -320,7 +320,7 @@ textarea {
 }
 
 .museum-title {
-  font-size: 0.9rem;
+  font-size: 0.78rem;
   letter-spacing: 0.35em;
   color: var(--muted);
 }
@@ -687,7 +687,7 @@ textarea {
   <div class="museum-list" id="museumList"></div>
 </div>
 
-<span class="version">v2.18</span>
+<span class="version">v2.19</span>
 
 <script>
 const MUSEUM_KEY = 'bside_museum';
@@ -1031,7 +1031,7 @@ function renderMuseum() {
     <div class="museum-item" id="mitem-${item.id}">
       <div class="museum-date">${item.date}</div>
       <div class="museum-text" id="mtext-${item.id}">${escapeHtml(item.text)}</div>
-      <button class="museum-release-btn" onclick="releaseMuseumItem(${item.id})">放つ</button>
+      <button class="museum-release-btn" onclick="releaseMuseumItem(${item.id})">${LANG[currentLang].release}</button>
     </div>
   `).join('');
 }
