@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>b-side v2.28</title>
+<title>b-side v2.29</title>
 <style>
 html {
   font-size: 18px;
@@ -688,7 +688,7 @@ textarea {
   <div class="museum-list" id="museumList"></div>
 </div>
 
-<span class="version">v2.28</span>
+<span class="version">v2.29</span>
 
 <script>
 const MUSEUM_KEY = 'bside_museum';
@@ -829,6 +829,7 @@ document.getElementById('menuTerms').addEventListener('click', () => {
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
 }
 
 function loadMuseum() {
