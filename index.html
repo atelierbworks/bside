@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>b-side</title>
+<title>b-side v2.20</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -687,7 +687,7 @@ textarea {
   <div class="museum-list" id="museumList"></div>
 </div>
 
-<span class="version">v2.19</span>
+<span class="version">v2.20</span>
 
 <script>
 const MUSEUM_KEY = 'bside_museum';
@@ -938,7 +938,7 @@ document.getElementById('btnRelease').addEventListener('click', () => {
   }, 1800);
 });
 
-document.getElementById('btnShare').addEventListener('click', async () => {
+document.getElementById('btnShare').addEventListener('click', () => {
   if (stillTimer) clearTimeout(stillTimer);
 
   const textToShare = currentDraft;
@@ -962,35 +962,25 @@ document.getElementById('btnShare').addEventListener('click', async () => {
     document.getElementById('stillBtns').classList.add('visible');
   };
 
-  // navigator.shareが使えるか確認
   const canShare = navigator.share && typeof navigator.share === 'function';
 
   if (canShare) {
-    try {
-      await navigator.share({ text: textToShare });
-      doSaveAndLeave();
-    } catch (e) {
-      if (e.name === 'AbortError') {
-        // ユーザーがキャンセル——Stillnessに留まる
-        doStay();
-      } else {
-        // その他のエラー——クリップボードにフォールバック
-        try {
-          await navigator.clipboard.writeText(textToShare);
-          doSaveAndLeave();
-        } catch {
+    navigator.share({ text: textToShare })
+      .then(() => { doSaveAndLeave(); })
+      .catch((e) => {
+        if (e.name === 'AbortError') {
           doStay();
+        } else {
+          // クリップボードにフォールバック
+          navigator.clipboard.writeText(textToShare)
+            .then(() => { doSaveAndLeave(); })
+            .catch(() => { doStay(); });
         }
-      }
-    }
+      });
   } else {
-    // 非対応——クリップボードにコピー
-    try {
-      await navigator.clipboard.writeText(textToShare);
-      doSaveAndLeave();
-    } catch {
-      doStay();
-    }
+    navigator.clipboard.writeText(textToShare)
+      .then(() => { doSaveAndLeave(); })
+      .catch(() => { doStay(); });
   }
 });
 
