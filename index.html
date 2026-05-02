@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>b-side v2.32</title>
+<title>b-side v2.33</title>
 <style>
 html {
   font-size: 18px;
@@ -75,6 +75,7 @@ body::before {
   min-width: 44px;
   min-height: 44px;
   transition: opacity 0.3s;
+  white-space: nowrap;
 }
 
 .btn:hover { opacity: 0.6; }
@@ -688,7 +689,7 @@ textarea {
   <div class="museum-list" id="museumList"></div>
 </div>
 
-<span class="version">v2.32</span>
+<span class="version">v2.33</span>
 
 <script>
 const MUSEUM_KEY = 'bside_museum';
@@ -736,7 +737,7 @@ const LANG = {
     done: 'Done', doneSub: '書き終える',
     stillMsg: 'Look for a while.',
     close: 'Keep', closeSub: '置く',
-    share: 'Pass', shareSub: '渡す',
+    share: 'Share', shareSub: '渡す',
     release: 'Release', releaseSub: '放つ',
     emptyMsg: 'Released.<br>Where it went, I do not know.<br>It is simply no longer here.',
     back: 'Back', backSub: '戻る',
