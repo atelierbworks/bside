@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>b-side v2.30</title>
+<title>b-side v2.31</title>
 <style>
 html {
   font-size: 18px;
@@ -688,7 +688,7 @@ textarea {
   <div class="museum-list" id="museumList"></div>
 </div>
 
-<span class="version">v2.30</span>
+<span class="version">v2.31</span>
 
 <script>
 const MUSEUM_KEY = 'bside_museum';
@@ -968,6 +968,7 @@ document.getElementById('btnShare').addEventListener('click', () => {
 
   if (canShare) {
     let shared = false;
+    window.focus();
     navigator.share({ text: textToShare })
       .then(() => {
         shared = true;
