@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>b-side</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #FFFFFF;
+  --text: #1A1A18;
+  --muted: #3A3A38;
+  --dim: #666660;
+  --border: #CCCCBB;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Hiragino Mincho ProN', 'Yu Mincho', '游明朝', Georgia, serif;
+  min-height: 100vh;
+  padding: 4rem 2rem 6rem;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.06;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+}
+
+.container {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.back-btn {
+  font-family: inherit;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--dim);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 3rem;
+  display: block;
+  text-decoration: none;
+}
+.back-btn:hover { opacity: 0.6; }
+
+.logo {
+  font-size: 1.1rem;
+  letter-spacing: 0.5em;
+  color: var(--muted);
+  margin-bottom: 2rem;
+  display: block;
+}
+
+.lang-toggle {
+  display: flex;
+  gap: 1.2rem;
+  margin-bottom: 3rem;
+}
+
+.lang-toggle button {
+  font-family: inherit;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  color: var(--dim);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid transparent;
+  cursor: pointer;
+  padding: 0.2rem 0;
+  transition: all 0.2s;
+}
+
+.lang-toggle button.active {
+  color: var(--text);
+  border-bottom-color: var(--text);
+}
+
+/* コンテンツ表示切替 */
+.ja-text { display: block; }
+.en-text { display: none; }
+body.lang-en .ja-text { display: none; }
+body.lang-en .en-text { display: block; }
+
+/* セクション */
+.section {
+  margin-bottom: 5rem;
+  scroll-margin-top: 2rem;
+}
+
+.section-title {
+  font-size: 0.75rem;
+  letter-spacing: 0.35em;
+  color: var(--dim);
+  margin-bottom: 2.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+p {
+  font-size: 0.82rem;
+  line-height: 2.3;
+  color: var(--muted);
+  margin-bottom: 1.6rem;
+}
+
+.steps {
+  margin: 1.5rem 0 2rem;
+}
+
+.step {
+  margin-bottom: 1.8rem;
+}
+
+.step-num {
+  font-size: 0.82rem;
+  letter-spacing: 0.15em;
+  color: var(--dim);
+  margin-bottom: 0.4rem;
+}
+
+.step-text {
+  font-size: 0.82rem;
+  line-height: 2;
+  color: var(--muted);
+}
+
+.actions {
+  margin: 1.5rem 0 2rem;
+}
+
+.action-item {
+  font-size: 0.82rem;
+  line-height: 2.4;
+  color: var(--muted);
+}
+
+.action-label {
+  color: var(--text);
+}
+
+.closing {
+  font-size: 0.82rem;
+  line-height: 2.4;
+  color: var(--dim);
+}
+
+/* PP・規約 */
+.article {
+  margin-bottom: 2.5rem;
+}
+
+.article-title {
+  font-size: 0.82rem;
+  letter-spacing: 0.15em;
+  color: var(--text);
+  margin-bottom: 1rem;
+}
+
+.article-body {
+  font-size: 0.82rem;
+  line-height: 2.3;
+  color: var(--muted);
+}
+
+.highlight {
+  color: var(--text);
+  font-weight: normal;
+}
+
+ul.list {
+  padding-left: 1.2rem;
+  margin: 0.8rem 0;
+}
+
+ul.list li {
+  font-size: 0.82rem;
+  line-height: 2.3;
+  color: var(--muted);
+  list-style: none;
+  padding-left: 0.8rem;
+  position: relative;
+}
+
+ul.list li::before {
+  content: '—';
+  position: absolute;
+  left: -0.8rem;
+  color: var(--border);
+}
+
+.credit {
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  color: var(--dim);
+  opacity: 0.5;
+  margin-top: 4rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+/* ナビ */
+.toc {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-bottom: 4rem;
+}
+
+.toc a {
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  color: var(--dim);
+  text-decoration: none;
+  padding: 0.3rem 0;
+  border-bottom: 1px solid transparent;
+  transition: all 0.2s;
+  display: block;
+}
+
+.toc a:hover {
+  color: var(--text);
+  border-bottom-color: var(--border);
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <button class="back-btn" onclick="history.back()">← back</button>
+  <span class="logo">b-side</span>
+
+  <div class="lang-toggle">
+    <button class="active" onclick="setLang('ja', this)">日本語</button>
+    <button onclick="setLang('en', this)">English</button>
+  </div>
+
+  <!-- 目次 -->
+  <nav class="toc">
+    <a href="#about"><span class="ja-text">b-sideについて</span><span class="en-text">About b-side</span></a>
+    <a href="#terms"><span class="ja-text">利用規約</span><span class="en-text">Terms of Use</span></a>
+    <a href="#privacy"><span class="ja-text">プライバシーポリシー</span><span class="en-text">Privacy Policy</span></a>
+  </nav>
+
+  <!-- ── b-sideについて ── -->
+  <section class="section" id="about">
+    <div class="section-title">
+      <span class="ja-text">b-sideについて</span>
+      <span class="en-text">About b-side</span>
+    </div>
+
+    <div class="ja-text">
+      <p>胸の奥で、まだうまく説明できないまま揺れているものはありませんか。<br>
+      誰かに届けるほどではないけれど、胸の中にある形にならない何か。<br>
+      それを書くだけです。</p>
+
+      <p>ここは、ガイドに従う場所でも、AIから答えを受け取る場所でもありません。<br>
+      呼吸を整え、自らの手で書き、自分の言葉を見つめる。<br>
+      あなただけの静寂の場所です。<br>
+      書いて、読み、消す、あるいは、置く。</p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">１．呼吸を整える</div>
+          <div class="step-text">画面の微かな揺らぎに合わせて、まずは深く一息。呼吸を整えることで自律神経が落ち着き、外の世界のスピードから離れて、自分自身の内側と向き合う準備が整います。</div>
+        </div>
+        <div class="step">
+          <div class="step-num">２．言葉を書く</div>
+          <div class="step-text">100文字以内で、今の感覚を書き留めます。論理も、正解も必要ありません。今の気持ちを言葉として「ラベリング」し、外に出すこと。それだけで、脳の興奮が静まり、ストレスが軽減されやすくなります。</div>
+        </div>
+        <div class="step">
+          <div class="step-num">３．見つめる</div>
+          <div class="step-text">書き終えたあと、10秒間の「凪」が訪れます。言葉が自分を離れ、客観的な事実としてそこにあるのを眺める。このわずかな距離が、思考の渦から自分を切り離す助けとなります。</div>
+        </div>
+        <div class="step">
+          <div class="step-num">４．行方を決める</div>
+          <div class="step-text">書いた言葉をどう扱うかは、あなたに委ねられています。</div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <div class="action-item"><span class="action-label">放つ：</span>言葉はどこにも残らず、霧のように消え去ります。</div>
+        <div class="action-item"><span class="action-label">置く：</span>言葉を残します。後で振り返ることができます。</div>
+        <div class="action-item"><span class="action-label">渡す：</span>あなた自身の手で、ふさわしい場所へ運びます。</div>
+      </div>
+
+      <p>b-sideは、あなたの言葉を解釈せず、何も言わずに、ただそこにあります。<br>
+      誰にも見せない言葉が、誰にも解釈されずに存在する場所です。<br>
+      データはデバイス内のみ、言葉が外へ出ることはありません。</p>
+
+      <p class="closing">言葉を置いて、見つめ、自分の呼吸に戻る。<br>
+      それだけのこと。<br>
+      けれど、そのあとに、心の中が少しだけ整理されている自分に気づくかもしれません。</p>
+    </div>
+
+    <div class="en-text">
+      <p>Is there something inside you — shapeless, wordless?<br>
+      Not something to share with anyone. Just something that is there.<br>
+      b-side is a place to write it down.</p>
+
+      <p>This is not a place to follow someone's guidance, or to receive answers from AI.<br>
+      Breathe, write in your own hand, and look at your own words.<br>
+      A place of silence that belongs only to you.<br>
+      Write, read, erase — or keep.</p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1. Breathe</div>
+          <div class="step-text">Follow the gentle rhythm on the screen and take a slow, deep breath. As your breathing settles, your nervous system quiets, and you step away from the pace of the outside world — ready to turn inward.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">2. Write</div>
+          <div class="step-text">Write down what you're feeling right now, in 100 characters or less. No logic needed. No right answer. Simply putting words to your feelings — labelling them, letting them out — is enough to calm the mind and ease the weight.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">3. Look</div>
+          <div class="step-text">After you finish writing, a stillness of ten seconds arrives. Your words sit there as something apart from you — a quiet fact. This small distance can help loosen the grip of a circling mind.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">4. Decide</div>
+          <div class="step-text">What happens to your words is yours to choose.</div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <div class="action-item"><span class="action-label">Release: </span>Your words fade like mist, leaving no trace.</div>
+        <div class="action-item"><span class="action-label">Keep: </span>They stay. You can return to them whenever you like.</div>
+        <div class="action-item"><span class="action-label">Send: </span>Carry them out, in your own hands, to wherever they belong.</div>
+      </div>
+
+      <p>b-side does not interpret your words. It says nothing. It is simply there.<br>
+      A place where words unseen by anyone can exist, unread by anyone.<br>
+      Your data stays on your device. Your words never leave.</p>
+
+      <p class="closing">Let your words settle. Look at them. Return to your breath.<br>
+      That is all.<br>
+      But afterward, you may find that something inside has shifted — just a little.</p>
+    </div>
+  </section>
+
+  <!-- ── 利用規約（先） ── -->
+  <section class="section" id="terms">
+    <div class="section-title">
+      <span class="ja-text">利用規約</span>
+      <span class="en-text">Terms of Use</span>
+    </div>
+
+    <div class="ja-text">
+
+      <div class="article">
+        <div class="article-title">第1条（適用）</div>
+        <div class="article-body">本利用規約（以下「本規約」といいます）は、atelier.b works（以下「当方」といいます）が提供するb-side（以下「本サービス」といいます）の利用条件を定めるものです。<br><br>
+        本サービスのご利用を開始した時点で、本規約に同意いただいたものとみなします。</div>
+      </div>
+
+      <div class="article">
+        <div class="article-title">第2条（権利帰属および禁止事項）</div>
+        <div class="article-body">本サービスに関する著作権その他の知的財産権は、すべて当方に帰属します。<br><br>
+        利用者は、本サービスの利用にあたり、以下の行為を行ってはなりません。
+        <ul class="list">
+          <li>法令または公序良俗に違反する行為</li>
+          <li>当方または第三者の権利・利益を侵害する行為</li>
+          <li>本サービスのソースコードのリバースエンジニアリングを試みる行為</li>
+          <li>本サービスの運営を妨害する行為</li>
+          <li>その他、当方が不適切と判断する行為</li>
+        </ul>
+        </div>
+      </div>
+
+      <div class="article">
+        <div class="article-title">第3条（免責事項）</div>
+        <div class="article-body">当方に故意または重大な過失がある場合を除き、当方は以下の事項について責任を負いません。
+        <ul class="list">
+          <li>利用者のデバイスの初期化・機種変更・ブラウザのデータ消去・ホーム画面からの削除等により、保存されたデータが消失した場合の補償</li>
+          <li>本サービスの利用により利用者に生じた損害</li>
+          <li>本サービスが利用者の特定の目的に適合することの保証</li>
+          <li>本サービスに不具合・エラーが生じないことの保証</li>
+        </ul>
+        </div>
+      </div>
+
+      <div class="article">
+        <div class="article-title">第4条（サービスの変更・停止・終了）</div>
+        <div class="article-body">当方は、利用者への事前の通知なく、本サービスの内容を変更し、または提供を停止・終了することができます。これにより利用者に損害が生じた場合であっても、当方に故意または重大な過失がある場合を除き、当方は責任を負いません。</div>
+      </div>
+
+      <div class="article">
+        <div class="article-title">第5条（本規約の変更）</div>
+        <div class="article-body">当方は、必要に応じて本規約を変更することがあります。変更後の規約は、本サービス内に掲示した時点から効力を生じるものとします。変更日は本規約冒頭の改定日に記載します。</div>
+      </div>
+
+      <div class="article">
+        <div class="article-title">第6条（準拠法・管轄裁判所）</div>
+        <div class="article-body">本規約の解釈および適用は日本法に準拠します。本サービスに関して生じた紛争については、東京地方裁判所を第一審の専属的合意管轄裁判所とします。</div>
+      </div>
+
+      <div class="article">
+        <div class="article-title">お問い合わせ</div>
+        <div class="article-body">atelier.b works<br>
+        Email：atelierbworks@gmail.com</div>
+      </div>
+    </div>
+
+    <div class="en-text">
+
+      <div class="article">
+        <div class="article-title">Article 1 (Application)</div>
+        <div class="article-body">These Terms of Use ("Terms") set out the conditions for use of b-side ("the Service") provided by atelier.b works ("we").<br><br>
+        By using the Service, you agree to these Terms.</div>
+      </div>
+
+      <div class="article">
+        <div class="article-title">Article 2 (Intellectual Property and Prohibited Activities)</div>
+        <div class="article-body">All copyrights and other intellectual property rights relating to the Service belong to us.<br><br>
+        Users must not engage in the following activities when using the Service:
+        <ul class="list">
+          <li>Any act that violates laws or regulations, or public order and morals</li>
+          <li>Any act that infringes the rights or interests of us or third parties</li>
+          <li>Any attempt to reverse-engineer the Service's source code</li>
+          <li>Any act that interferes with the operation of the Service</li>
+          <li>Any other act that we deem inappropriate</li>
+        </ul>
+        </div>
+      </div>
+
+      <div class="article">
+        <div class="article-title">Article 3 (Disclaimer)</div>
+        <div class="article-body">THE SERVICE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED. Except in cases of our willful misconduct or gross negligence, we are not responsible for the following:
+        <ul class="list">
+          <li>Loss of saved data due to device reset, change of device, clearing of browser data, deletion from the home screen, or similar actions</li>
+          <li>Any damages incurred by users in connection with the use of the Service</li>
+          <li>Any guarantee that the Service is fit for a particular purpose</li>
+          <li>Any guarantee that the Service will be free from defects or errors</li>
+        </ul>
+        </div>
+      </div>
+
+      <div class="article">
+        <div class="article-title">Article 4 (Changes, Suspension, and Termination of Service)</div>
+        <div class="article-body">We may change the content of the Service, or suspend or terminate the Service without prior notice to users. Except in cases of our willful misconduct or gross negligence, we are not responsible for any damages incurred by users as a result.</div>
+      </div>
+
+      <div class="article">
+        <div class="article-title">Article 5 (Changes to These Terms)</div>
+        <div class="article-body">We may update these Terms from time to time. Any changes will take effect when posted within the Service. The date of the latest update will be noted at the top of these Terms.</div>
+      </div>
+
+      <div class="article">
+        <div class="article-title">Article 6 (Governing Law and Jurisdiction)</div>
+        <div class="article-body">These Terms shall be governed by and construed in accordance with the laws of Japan. Any disputes arising in connection with the Service shall be subject to the exclusive jurisdiction of the Tokyo District Court as the court of first instance.</div>
+      </div>
+
+      <div class="article">
+        <div class="article-title">Contact</div>
+        <div class="article-body">atelier.b works<br>
+        Email: atelierbworks@gmail.com</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── プライバシーポリシー（後） ── -->
+  <section class="section" id="privacy">
+    <div class="section-title">
+      <span class="ja-text">プライバシーポリシー</span>
+      <span class="en-text">Privacy Policy</span>
+    </div>
+
+    <div class="ja-text">
+
+      <div class="article">
+        <div class="article-title">1. はじめに</div>
+        <div class="article-body">atelier.b works（以下「当方」といいます）は、b-side（以下「本サービス」といいます）をご利用いただくにあたり、利用者の皆さまのプライバシーを尊重し、個人情報の保護に努めます。本プライバシーポリシー（以下「本ポリシー」といいます）は、本サービスにおける情報の取扱いについて定めるものです。<br><br>
+        本サービスのご利用を開始した時点で、本ポリシーに同意いただいたものとみなします。</div>
+      </div>
+
+      <div class="article">
+        <div class="article-title">2. 収集する情報</div>
+        <div class="article-body"><span class="highlight">当方は、利用者の個人情報を一切収集しません。</span><br><br>
+        本サービスは、以下の設計に基づいて動作します。
+        <ul class="list">
+          <li>アカウント登録は不要です。</li>
+          <li>氏名・メールアドレス・位置情報その他の個人情報を取得しません。</li>
+          <li>利用者が入力した情報は、外部に送信されません。</li>
+          <li>広告の配信は行いません。広告目的での情報収集も行いません。</li>
+          <li>Cookieを使用しません。</li>
+          <li>Google Analytics等のアクセス解析ツールを使用しません。</li>
+          <li>外部サービスへの情報送信は一切行いません。</li>
+        </ul>
+        当方は、利用者の情報を第三者に提供・販売しません。提供・販売すべき情報を保有していないためです。</div>
+      </div>
+
+      <div class="article">
+        <div class="article-title">3. ホスティング環境について</div>
+        <div class="article-body">本サービスはウェブホスティングサービスを通じて提供されています。当方は利用者のアクセス情報を収集しませんが、ホスティングサービス提供者が独自にアクセスログ等を取得する場合があります。詳細は各サービスのプライバシーポリシーをご確認ください。</div>
+      </div>
+
+      <div class="article">
+        <div class="article-title">4. データの保存場所</div>
+        <div class="article-body">利用者が本サービス内で入力・保存した情報は、<span class="highlight">利用者のデバイス内にのみ保存</span>されます。<br><br>
+        当方はそのデータを閲覧・収集・利用することができません。</div>
+      </div>
+
+      <div class="article">
+        <div class="article-title">5. データの削除</div>
+        <div class="article-body">利用者は、本サービス内の「全削除」機能、またはブラウザのデータ消去により、保存されたデータをいつでも削除できます。削除されたデータは復元できません。</div>
+      </div>
+
+      <div class="article">
+        <div class="article-title">6. データの消失について</div>
+        <div class="article-body">以下の場合、保存されたデータは消失します。
+        <ul class="list">
+          <li>デバイスの初期化</li>
+          <li>機種変更</li>
+          <li>ブラウザのデータ消去</li>
+          <li>ホーム画面に追加した場合、その削除によりデータが消失することがあります。</li>
+        </ul>
+        当方はデータの消失について責任を負いません。大切な言葉は、別途ご自身で保存されることをお勧めします。</div>
+      </div>
+
+      <div class="article">
+        <div class="article-title">7. 安全管理</div>
+        <div class="article-body">当方は利用者の個人情報を保有しないため、情報漏えいのリスクはありません。また、保有個人データの開示請求についても、保有する個人情報がないため対象外となります。</div>
+      </div>
+
+      <div class="article">
+        <div class="article-title">8. 本ポリシーの変更</div>
+        <div class="article-body">当方は、必要に応じて本ポリシーを変更することがあります。変更後のポリシーは、本サービス内に掲示した時点から効力を生じるものとします。変更日は本ポリシー冒頭の改定日に記載します。</div>
+      </div>
+
+      <div class="article">
+        <div class="article-title">9. お問い合わせ</div>
+        <div class="article-body">本ポリシーに関するお問い合わせは、以下までご連絡ください。<br><br>
+        atelier.b works<br>
+        Email：atelierbworks@gmail.com</div>
+      </div>
+    </div>
+
+    <div class="en-text">
+
+      <div class="article">
+        <div class="article-title">1. Introduction</div>
+        <div class="article-body">atelier.b works ("we") respects the privacy of users of b-side ("the Service"). This Privacy Policy explains how we handle information in connection with the Service.<br><br>
+        By using the Service, you agree to this Privacy Policy.</div>
+      </div>
+
+      <div class="article">
+        <div class="article-title">2. Information We Collect</div>
+        <div class="article-body"><span class="highlight">We do not collect any personal information.</span><br><br>
+        The Service is designed as follows:
+        <ul class="list">
+          <li>No account registration is required.</li>
+          <li>We do not collect names, email addresses, location data, or any other personal information.</li>
+          <li>Information you enter is never transmitted outside your device.</li>
+          <li>We do not serve advertisements or collect information for advertising purposes.</li>
+          <li>We do not use cookies.</li>
+          <li>We do not use analytics tools such as Google Analytics.</li>
+          <li>We do not send any information to external services.</li>
+        </ul>
+        We do not share or sell any information about users with or to third parties. We have no such information to share or sell.</div>
+      </div>
+
+      <div class="article">
+        <div class="article-title">3. Hosting</div>
+        <div class="article-body">The Service is delivered via a web hosting platform. While we do not collect any access information, the hosting provider may independently collect access logs or similar data. Please refer to the hosting provider's privacy policy for details.</div>
+      </div>
+
+      <div class="article">
+        <div class="article-title">4. Data Storage</div>
+        <div class="article-body">Information you write and save in the Service is stored only <span class="highlight">within your device</span>.<br><br>
+        We have no ability to access, collect, or use your data.</div>
+      </div>
+
+      <div class="article">
+        <div class="article-title">5. Deleting Your Data</div>
+        <div class="article-body">You can delete your data at any time using the "Delete All" function within the Service, or by clearing your browser's data. Deleted data cannot be recovered.</div>
+      </div>
+
+      <div class="article">
+        <div class="article-title">6. Data Loss</div>
+        <div class="article-body">Your data will be lost in the following cases:
+        <ul class="list">
+          <li>Device reset</li>
+          <li>Changing to a new device</li>
+          <li>Clearing browser data</li>
+          <li>If you have added the Service to your home screen, deleting it from your home screen may result in data loss.</li>
+        </ul>
+        We are not responsible for any loss of data. We recommend keeping a personal copy of any words that are important to you.</div>
+      </div>
+
+      <div class="article">
+        <div class="article-title">7. Security</div>
+        <div class="article-body">We do not hold any personal information, and therefore there is no risk of personal data breach. As we hold no personal data, requests for disclosure of personal data are not applicable.</div>
+      </div>
+
+      <div class="article">
+        <div class="article-title">8. Changes to This Policy</div>
+        <div class="article-body">We may update this Privacy Policy from time to time. Any changes will take effect when posted within the Service. The date of the latest update will be noted at the top of this Policy.</div>
+      </div>
+
+      <div class="article">
+        <div class="article-title">9. Contact</div>
+        <div class="article-body">If you have any questions about this Privacy Policy, please contact us:<br><br>
+        atelier.b works<br>
+        Email: atelierbworks@gmail.com</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="credit">atelier.b works</div>
+
+</div>
+
+<script>
+function setLang(lang, btn) {
+  document.body.className = lang === 'en' ? 'lang-en' : '';
+  document.querySelectorAll('.lang-toggle button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// URLのハッシュに応じて言語とセクションを設定
+window.addEventListener('DOMContentLoaded', () => {
+  // 言語パラメータ確認（例：bside-legal.html?lang=en#privacy）
+  const params = new URLSearchParams(window.location.search);
+  const lang = params.get('lang');
+  if (lang === 'en') {
+    document.body.className = 'lang-en';
+    document.querySelectorAll('.lang-toggle button')[1].classList.add('active');
+    document.querySelectorAll('.lang-toggle button')[0].classList.remove('active');
+  }
+
+  // ハッシュへのスクロール
+  if (window.location.hash) {
+    setTimeout(() => {
+      const el = document.querySelector(window.location.hash);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>b-side</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #FFFFFF;
+  --text: #1A1A18;
+  --muted: #3A3A38;
+  --dim: #666660;
+  --border: #CCCCBB;
+  --accent: #1A1A18;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Hiragino Mincho ProN', 'Yu Mincho', '游明朝', Georgia, serif;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* noiseテクスチャ */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.06;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+  pointer-events: none;
+}
+
+.screen {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 480px;
+  min-height: 100vh;
+  padding: 3rem 2rem;
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.screen.active {
+  display: flex;
+  animation: fade-in 0.8s ease;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.btn {
+  font-family: inherit;
+  font-size: 0.85rem;
+  letter-spacing: 0.2em;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.8rem 1.6rem;
+  min-width: 44px;
+  min-height: 44px;
+  transition: opacity 0.3s;
+}
+
+.btn:hover { opacity: 0.6; }
+
+.btn-primary {
+  color: #fff;
+  background: var(--accent);
+}
+
+.btn-secondary {
+  color: var(--muted);
+}
+
+/* ── Entrance ── */
+#entrance { gap: 3.5rem; }
+
+.logo {
+  font-size: 1.1rem;
+  letter-spacing: 0.5em;
+  color: #3A3A38;
+}
+
+.entrance-btns {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.entrance-message {
+  font-size: 0.95rem;
+  letter-spacing: 0.1em;
+  color: #444440;
+  text-align: center;
+  line-height: 1.9;
+}
+
+/* ── Breath ── */
+#breath { gap: 2.5rem; }
+
+.breath-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.breath-circle {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(42, 42, 40, 0.55);
+  animation: breathe 8s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(0.7); opacity: 0.6; }
+  50% { transform: scale(1.9); opacity: 0.2; }
+}
+
+.breath-label {
+  font-size: 0.85rem;
+  letter-spacing: 0.4em;
+  color: var(--dim);
+  margin-top: 0.5rem;
+}
+
+.breath-message {
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  color: #444440;
+  text-align: center;
+  line-height: 2;
+}
+
+.breath-btns {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ── Draft ── */
+#draft {
+  justify-content: space-between;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+.draft-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1.2rem;
+  border-bottom: none;
+}
+
+.draft-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.35em;
+  color: var(--dim);
+}
+
+.sediment-btn {
+  font-size: 0.85rem;
+  letter-spacing: 0.2em;
+  color: var(--dim);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  min-width: 44px;
+  min-height: 44px;
+  font-family: inherit;
+  transition: color 0.3s;
+}
+
+.sediment-btn:hover { color: var(--muted); }
+
+.draft-message {
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  color: #444440;
+  line-height: 1.8;
+  text-align: center;
+  padding: 0.5rem 0;
+}
+
+textarea {
+  flex: 1;
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 2;
+  resize: none;
+  padding: 0;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent calc(2em - 1px),
+    #E8E8E0 calc(2em - 1px),
+    #E8E8E0 2em
+  );
+}
+
+.char-count {
+  width: 100%;
+  text-align: right;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  color: #BBBBAA;
+  padding: 0.2rem 0;
+}
+
+.draft-footer {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--border);
+}
+
+/* ── Stillness ── */
+#stillness { gap: 3.5rem; }
+
+.still-text {
+  font-size: 0.95rem;
+  line-height: 2;
+  color: var(--text);
+  text-align: center;
+  max-width: 320px;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.still-message {
+  font-size: 0.9rem;
+  letter-spacing: 0.1em;
+  color: #444440;
+  text-align: center;
+}
+
+.progress-bar {
+  width: 100px;
+  height: 1px;
+  background: #BBBBAA;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #555550;
+  width: 0%;
+}
+
+.still-btns {
+  display: flex;
+  gap: 1.5rem;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.still-btns.visible { opacity: 1; }
+
+/* ── Empty ── */
+#empty { gap: 2.5rem; }
+
+.empty-message {
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  color: #444440;
+  text-align: center;
+  line-height: 2.2;
+}
+
+.empty-symbol {
+  font-size: 1.5rem;
+  color: #888880;
+  letter-spacing: 0.3em;
+}
+
+/* ── Museum ── */
+#museum {
+  justify-content: flex-start;
+  padding-top: 2rem;
+  overflow-y: auto;
+}
+
+.museum-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1.2rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.5rem;
+  flex-shrink: 0;
+}
+
+.museum-title {
+  font-size: 0.65rem;
+  letter-spacing: 0.35em;
+  color: var(--muted);
+}
+
+.museum-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding-bottom: 2rem;
+}
+
+.museum-item {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1.2rem;
+  position: relative;
+}
+
+.museum-date {
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  color: var(--dim);
+  margin-bottom: 0.5rem;
+}
+
+.museum-text {
+  font-size: 0.85rem;
+  line-height: 1.9;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.museum-release-btn {
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  color: var(--dim);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.4rem 0;
+  font-family: inherit;
+  margin-top: 0.5rem;
+  transition: color 0.3s;
+}
+
+.museum-release-btn:hover { color: var(--muted); }
+
+.museum-empty {
+  color: var(--dim);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-align: center;
+  padding: 3rem 0;
+  line-height: 2;
+}
+
+/* 霧アニメーション */
+@keyframes fog-release {
+  0%   { opacity: 1; filter: blur(0); }
+  50%  { opacity: 0.3; filter: blur(4px); transform: translateY(-4px); }
+  100% { opacity: 0; filter: blur(12px); transform: translateY(-12px); }
+}
+
+.releasing {
+  animation: fog-release 1.8s ease-out forwards;
+  pointer-events: none;
+}
+
+/* ── ハンバーガーメニュー ── */
+.hamburger-btn {
+  position: fixed;
+  top: 1.2rem;
+  right: 1.5rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 10000;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.hamburger-btn span {
+  display: block;
+  width: 20px;
+  height: 1px;
+  background: var(--dim);
+  transition: opacity 0.3s;
+}
+
+.hamburger-btn:hover span { opacity: 0.5; }
+
+.menu-overlay {
+  display: none;
+  position: fixed;
+  top: 0; right: 0;
+  width: 100%; height: 100%;
+  z-index: 10002;
+  background: #FFFFFF;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  animation: fade-in 0.3s ease;
+}
+
+.menu-overlay.active { display: flex; }
+
+.menu-close {
+  position: absolute;
+  top: 1.2rem;
+  right: 1.5rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  color: var(--dim);
+  font-family: inherit;
+  padding: 0.5rem;
+}
+
+.menu-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.menu-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  color: var(--dim);
+}
+
+.lang-btns {
+  display: flex;
+  gap: 1rem;
+}
+
+.lang-btn {
+  font-family: inherit;
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  color: var(--dim);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid transparent;
+  transition: all 0.2s;
+}
+
+.lang-btn.active {
+  color: var(--text);
+  border-bottom-color: var(--text);
+}
+
+.menu-link {
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  color: var(--dim);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0.3rem 0;
+}
+
+.version {
+  position: fixed;
+  bottom: 1rem;
+  right: 1.5rem;
+  font-size: 0.5rem;
+  letter-spacing: 0.15em;
+  color: var(--dim);
+  opacity: 0.4;
+  z-index: 10001;
+}
+.bilingual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+}
+
+.bilingual .primary { font-size: 0.85rem; }
+.bilingual .secondary {
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  color: var(--dim);
+  opacity: 0.7;
+}
+
+.btn-primary .bilingual .secondary {
+  color: rgba(255,255,255,0.6);
+  opacity: 1;
+}
+
+.btn-primary:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
+.btn-primary:disabled:hover {
+  opacity: 0.25;
+}
+</style>
+</head>
+<body>
+
+<!-- ハンバーガーボタン -->
+<button class="hamburger-btn" id="hamburgerBtn" aria-label="メニュー">
+  <span></span><span></span><span></span>
+</button>
+
+<!-- メニューオーバーレイ -->
+<div class="menu-overlay" id="menuOverlay">
+  <button class="menu-close" id="menuClose">✕</button>
+
+  <div class="menu-section">
+    <span class="menu-label">language</span>
+    <div class="lang-btns">
+      <button class="lang-btn active" data-lang="ja">日本語</button>
+      <button class="lang-btn" data-lang="en">English</button>
+    </div>
+  </div>
+
+  <div class="menu-section">
+    <button class="menu-link" id="menuAbout">b-sideについて</button>
+    <button class="menu-link" id="menuTerms">利用規約</button>
+    <button class="menu-link" id="menuPrivacy">プライバシーポリシー</button>
+  </div>
+</div>
+
+<!-- Entrance -->
+<div class="screen active" id="entrance">
+  <span class="logo">b-side</span>
+  <p class="entrance-message" id="entranceMsg">言葉を置く場所。<br>何も返さない。ただ、ここにある。</p>
+  <div class="entrance-btns">
+    <button class="btn btn-primary" id="btnStart">
+      <div class="bilingual">
+        <span class="primary" id="lblStart">呼吸を整える</span>
+        <span class="secondary" id="lblStartSub">breathe</span>
+      </div>
+    </button>
+    <button class="btn btn-secondary" id="btnContinue">
+      <div class="bilingual">
+        <span class="primary" id="lblContinue">つぶやく</span>
+        <span class="secondary" id="lblContinueSub">continue</span>
+      </div>
+    </button>
+  </div>
+</div>
+
+<!-- Breath -->
+<div class="screen" id="breath">
+  <div class="breath-wrap">
+    <div class="breath-circle"></div>
+    <span class="breath-label" id="lblBreath">呼吸</span>
+  </div>
+  <p class="breath-message" id="breathMsg">急がなくていい。<br>整ったと感じたら、次へ。</p>
+  <div class="breath-btns">
+    <button class="btn btn-primary" id="btnReady">
+      <div class="bilingual">
+        <span class="primary" id="lblReady">準備ができた</span>
+        <span class="secondary" id="lblReadySub">ready</span>
+      </div>
+    </button>
+    <button class="btn btn-secondary" id="btnBreathEnd">
+      <div class="bilingual">
+        <span class="primary" id="lblBreathEnd">終わる</span>
+        <span class="secondary" id="lblBreathEndSub">end</span>
+      </div>
+    </button>
+  </div>
+</div>
+
+<!-- Draft -->
+<div class="screen" id="draft">
+  <div class="draft-header">
+    <span class="draft-label">b-side</span>
+    <button class="sediment-btn" id="btnMuseum">
+      <div class="bilingual" style="align-items:flex-end">
+        <span class="primary" id="lblSediment">沈殿</span>
+        <span class="secondary" id="lblSedimentSub">sediment</span>
+      </div>
+    </button>
+  </div>
+  <p class="draft-message" id="draftMsg">誰にも見せない言葉を、ここに。</p>
+  <textarea id="draftArea" maxlength="100"></textarea>
+  <div class="char-count"><span id="charCount">0</span> / 100</div>
+  <div class="draft-footer">
+    <button class="btn btn-secondary" id="btnAbort">
+      <div class="bilingual">
+        <span class="primary" id="lblAbort">中断</span>
+        <span class="secondary" id="lblAbortSub">cancel</span>
+      </div>
+    </button>
+    <button class="btn btn-primary" id="btnDone" disabled>
+      <div class="bilingual">
+        <span class="primary" id="lblDone">書き終える</span>
+        <span class="secondary" id="lblDoneSub">done</span>
+      </div>
+    </button>
+  </div>
+</div>
+
+<!-- Stillness -->
+<div class="screen" id="stillness">
+  <div class="still-text" id="stillText"></div>
+  <p class="still-message" id="stillMsg">しばらく、見つめる。</p>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+  <div class="still-btns" id="stillBtns">
+    <button class="btn btn-secondary" id="btnClose">
+      <div class="bilingual">
+        <span class="primary" id="lblClose">置く</span>
+        <span class="secondary" id="lblCloseSub">keep</span>
+      </div>
+    </button>
+    <button class="btn btn-secondary" id="btnShare">
+      <div class="bilingual">
+        <span class="primary" id="lblShare">渡す</span>
+        <span class="secondary" id="lblShareSub">share</span>
+      </div>
+    </button>
+    <button class="btn btn-primary" id="btnRelease">
+      <div class="bilingual">
+        <span class="primary" id="lblRelease">放つ</span>
+        <span class="secondary" id="lblReleaseSub">release</span>
+      </div>
+    </button>
+  </div>
+</div>
+
+<!-- Empty -->
+<div class="screen" id="empty">
+  <p class="empty-message" id="emptyMsg">放たれた。<br>どこへ行ったかは、知らない。<br>ただ、ここにはもうない。</p>
+  <button class="btn btn-secondary" id="btnEmptyEnd">
+    <div class="bilingual">
+      <span class="primary" id="lblEmptyEnd">戻る</span>
+      <span class="secondary" id="lblEmptyEndSub">back</span>
+    </div>
+  </button>
+</div>
+
+<!-- Museum -->
+<div class="screen" id="museum">
+  <div class="museum-header">
+    <div class="bilingual" style="align-items:flex-start">
+      <span class="museum-title" id="lblMuseumTitle">沈殿</span>
+      <span style="font-size:0.55rem;letter-spacing:0.15em;color:var(--dim);opacity:0.7" id="lblMuseumSub">sediment</span>
+    </div>
+    <button class="btn btn-secondary" id="btnMuseumBack">
+      <div class="bilingual">
+        <span class="primary" id="lblMuseumBack">戻る</span>
+        <span class="secondary" id="lblMuseumBackSub">back</span>
+      </div>
+    </button>
+  </div>
+  <div class="museum-list" id="museumList"></div>
+</div>
+
+<span class="version">v2.17</span>
+
+<script>
+const MUSEUM_KEY = 'bside_museum';
+const STILLNESS_SEC = 10;
+
+let currentDraft = '';
+let stillTimer = null;
+let currentLang = localStorage.getItem('bside_lang') || 'ja';
+
+// ── 言語データ ──
+const LANG = {
+  ja: {
+    entranceMsg: '言葉を置く場所。<br>何も返さない。ただ、ここにある。',
+    start: '呼吸を整える', startSub: 'breathe',
+    continue: '書く', continueSub: 'write',
+    breath: '呼吸', breathMsg: '急がなくていい。<br>整ったと感じたら、次へ。',
+    ready: '準備ができた', readySub: 'ready',
+    breathEnd: '終わる', breathEndSub: 'end',
+    sediment: '沈殿', sedimentSub: 'sediment',
+    draftMsg: '誰にも見せない言葉を、ここに。',
+    abort: '中断', abortSub: 'cancel',
+    done: '書き終える', doneSub: 'done',
+    stillMsg: 'しばらく、見つめる。',
+    close: '置く', closeSub: 'keep',
+    share: '渡す', shareSub: 'share',
+    release: '放つ', releaseSub: 'release',
+    emptyMsg: '放たれた。<br>どこへ行ったかは、知らない。<br>ただ、ここにはもうない。',
+    back: '戻る', backSub: 'back',
+    museumTitle: '沈殿', museumSub: 'sediment',
+    about: 'b-sideについて',
+    privacy: 'プライバシーポリシー',
+    terms: '利用規約',
+    museumEmpty: 'まだ何も沈んでいない。<br>ここは、閉じることを選んだ言葉が残る場所。',
+  },
+  en: {
+    entranceMsg: 'A place to lay words down.<br>Nothing returns. It is simply here.',
+    start: 'Breathe', startSub: '呼吸を整える',
+    continue: 'Write', continueSub: '書く',
+    breath: 'Breath', breathMsg: 'Take your time.<br>When you feel ready, move on.',
+    ready: 'I am ready', readySub: '準備ができた',
+    breathEnd: 'End', breathEndSub: '終わる',
+    sediment: 'Sediment', sedimentSub: '沈殿',
+    draftMsg: 'Words you will show no one, here.',
+    abort: 'Cancel', abortSub: '中断',
+    done: 'Done', doneSub: '書き終える',
+    stillMsg: 'Look for a while.',
+    close: 'Keep', closeSub: '置く',
+    share: 'Pass', shareSub: '渡す',
+    release: 'Release', releaseSub: '放つ',
+    emptyMsg: 'Released.<br>Where it went, I do not know.<br>It is simply no longer here.',
+    back: 'Back', backSub: '戻る',
+    museumTitle: 'Sediment', museumSub: '沈殿',
+    about: 'About b-side',
+    privacy: 'Privacy Policy',
+    terms: 'Terms of Use',
+    museumEmpty: 'Nothing has settled yet.<br>This is a place where words you chose to keep remain.',
+  },
+};
+
+function applyLang() {
+  const L = LANG[currentLang];
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.innerHTML = val; };
+
+  set('entranceMsg', L.entranceMsg);
+  set('lblStart', L.start); set('lblStartSub', L.startSub);
+  set('lblContinue', L.continue); set('lblContinueSub', L.continueSub);
+  set('lblBreath', L.breath);
+  set('breathMsg', L.breathMsg);
+  set('lblReady', L.ready); set('lblReadySub', L.readySub);
+  set('lblBreathEnd', L.breathEnd); set('lblBreathEndSub', L.breathEndSub);
+  set('lblSediment', L.sediment); set('lblSedimentSub', L.sedimentSub);
+  set('draftMsg', L.draftMsg);
+  set('lblAbort', L.abort); set('lblAbortSub', L.abortSub);
+  set('lblDone', L.done); set('lblDoneSub', L.doneSub);
+  set('stillMsg', L.stillMsg);
+  set('lblClose', L.close); set('lblCloseSub', L.closeSub);
+  set('lblShare', L.share); set('lblShareSub', L.shareSub);
+  set('lblRelease', L.release); set('lblReleaseSub', L.releaseSub);
+  set('emptyMsg', L.emptyMsg);
+  set('lblEmptyEnd', L.back); set('lblEmptyEndSub', L.backSub);
+  set('lblMuseumTitle', L.museumTitle); set('lblMuseumSub', L.museumSub);
+  set('lblMuseumBack', L.back); set('lblMuseumBackSub', L.backSub);
+  set('menuAbout', L.about);
+  set('menuPrivacy', L.privacy);
+  set('menuTerms', L.terms);
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === currentLang);
+  });
+
+  // Museum表示中なら再レンダリング
+  if (document.getElementById('museum').classList.contains('active')) {
+    renderMuseum();
+  }
+}
+
+// ── ハンバーガーメニュー ──
+document.getElementById('hamburgerBtn').addEventListener('click', () => {
+  document.getElementById('menuOverlay').classList.add('active');
+  document.getElementById('hamburgerBtn').style.display = 'none';
+});
+
+document.getElementById('menuClose').addEventListener('click', () => {
+  document.getElementById('menuOverlay').classList.remove('active');
+  document.getElementById('hamburgerBtn').style.display = 'flex';
+});
+
+document.getElementById('menuOverlay').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('menuOverlay')) {
+    document.getElementById('menuOverlay').classList.remove('active');
+    document.getElementById('hamburgerBtn').style.display = 'flex';
+  }
+});
+
+document.querySelectorAll('.lang-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    currentLang = btn.dataset.lang;
+    localStorage.setItem('bside_lang', currentLang);
+    applyLang();
+  });
+});
+
+document.getElementById('menuAbout').addEventListener('click', () => {
+  const lang = currentLang === 'en' ? '?lang=en' : '';
+  window.location.href = `bside-legal.html${lang}#about`;
+});
+
+document.getElementById('menuPrivacy').addEventListener('click', () => {
+  const lang = currentLang === 'en' ? '?lang=en' : '';
+  window.location.href = `bside-legal.html${lang}#privacy`;
+});
+
+document.getElementById('menuTerms').addEventListener('click', () => {
+  const lang = currentLang === 'en' ? '?lang=en' : '';
+  window.location.href = `bside-legal.html${lang}#terms`;
+});
+
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function loadMuseum() {
+  return JSON.parse(localStorage.getItem(MUSEUM_KEY) || '[]');
+}
+
+function saveMuseum(data) {
+  localStorage.setItem(MUSEUM_KEY, JSON.stringify(data));
+}
+
+function hasMuseum() {
+  return loadMuseum().length > 0;
+}
+
+function initEntrance() {
+  const btn = document.getElementById('btnContinue');
+  btn.style.display = hasMuseum() ? 'inline-block' : 'none';
+}
+
+function resetDraft() {
+  currentDraft = '';
+  document.getElementById('draftArea').value = '';
+  document.getElementById('charCount').textContent = '0';
+  document.getElementById('btnDone').disabled = true;
+}
+
+// ── Entrance ──
+document.getElementById('btnStart').addEventListener('click', () => {
+  showScreen('breath');
+});
+
+document.getElementById('btnContinue').addEventListener('click', () => {
+  resetDraft();
+  showScreen('draft');
+});
+
+// ── Breath ──
+document.getElementById('btnReady').addEventListener('click', () => {
+  resetDraft();
+  showScreen('draft');
+});
+
+document.getElementById('btnBreathEnd').addEventListener('click', () => {
+  showScreen('entrance');
+  initEntrance();
+});
+
+// ── Draft ──
+document.getElementById('draftArea').addEventListener('input', (e) => {
+  currentDraft = e.target.value;
+  const len = currentDraft.length;
+  document.getElementById('charCount').textContent = len;
+  document.getElementById('btnDone').disabled = len === 0;
+});
+
+document.getElementById('btnDone').addEventListener('click', () => {
+  const text = document.getElementById('draftArea').value.trim();
+  if (!text) return;
+  currentDraft = text;
+  startStillness(text);
+});
+
+document.getElementById('btnAbort').addEventListener('click', () => {
+  resetDraft();
+  showScreen('entrance');
+  initEntrance();
+});
+
+document.getElementById('btnMuseum').addEventListener('click', () => {
+  renderMuseum();
+  showScreen('museum');
+});
+
+// ── Stillness ──
+function startStillness(text) {
+  document.getElementById('stillText').textContent = text;
+  document.getElementById('stillBtns').classList.remove('visible');
+
+  const fill = document.getElementById('progressFill');
+  fill.style.transition = 'none';
+  fill.style.width = '0%';
+
+  showScreen('stillness');
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      fill.style.transition = `width ${STILLNESS_SEC}s linear`;
+      fill.style.width = '100%';
+    });
+  });
+
+  if (stillTimer) clearTimeout(stillTimer);
+  stillTimer = setTimeout(() => {
+    document.getElementById('stillBtns').classList.add('visible');
+  }, STILLNESS_SEC * 1000);
+}
+
+document.getElementById('btnRelease').addEventListener('click', () => {
+  if (stillTimer) clearTimeout(stillTimer);
+  const stillText = document.getElementById('stillText');
+  stillText.classList.add('releasing');
+
+  setTimeout(() => {
+    stillText.classList.remove('releasing');
+    currentDraft = '';
+    document.getElementById('draftArea').value = '';
+    showScreen('empty');
+  }, 1800);
+});
+
+document.getElementById('btnShare').addEventListener('click', async () => {
+  if (stillTimer) clearTimeout(stillTimer);
+
+  const textToShare = currentDraft;
+
+  const doSaveAndLeave = () => {
+    const museum = loadMuseum();
+    const now = new Date();
+    const dateStr = now.toLocaleString('ja-JP', {
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit'
+    });
+    museum.unshift({ id: Date.now(), text: textToShare, date: dateStr });
+    saveMuseum(museum);
+    currentDraft = '';
+    document.getElementById('draftArea').value = '';
+    showScreen('entrance');
+    initEntrance();
+  };
+
+  const doStay = () => {
+    document.getElementById('stillBtns').classList.add('visible');
+  };
+
+  // navigator.shareが使えるか確認
+  const canShare = navigator.share && typeof navigator.share === 'function';
+
+  if (canShare) {
+    try {
+      await navigator.share({ text: textToShare });
+      doSaveAndLeave();
+    } catch (e) {
+      if (e.name === 'AbortError') {
+        // ユーザーがキャンセル——Stillnessに留まる
+        doStay();
+      } else {
+        // その他のエラー——クリップボードにフォールバック
+        try {
+          await navigator.clipboard.writeText(textToShare);
+          doSaveAndLeave();
+        } catch {
+          doStay();
+        }
+      }
+    }
+  } else {
+    // 非対応——クリップボードにコピー
+    try {
+      await navigator.clipboard.writeText(textToShare);
+      doSaveAndLeave();
+    } catch {
+      doStay();
+    }
+  }
+});
+
+document.getElementById('btnClose').addEventListener('click', () => {
+  if (stillTimer) clearTimeout(stillTimer);
+  // Museumに保存
+  const museum = loadMuseum();
+  const now = new Date();
+  const dateStr = now.toLocaleString('ja-JP', {
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit'
+  });
+  museum.unshift({ id: Date.now(), text: currentDraft, date: dateStr });
+  saveMuseum(museum);
+  currentDraft = '';
+  document.getElementById('draftArea').value = '';
+  showScreen('entrance');
+  initEntrance();
+});
+
+// ── Empty ──
+document.getElementById('btnEmptyEnd').addEventListener('click', () => {
+  showScreen('entrance');
+  initEntrance();
+});
+
+// ── Museum ──
+function renderMuseum() {
+  const list = document.getElementById('museumList');
+  const museum = loadMuseum().filter(item => !item.released);
+
+  if (museum.length === 0) {
+    list.innerHTML = `<div class="museum-empty">${LANG[currentLang].museumEmpty}</div>`;
+    return;
+  }
+
+  list.innerHTML = museum.map(item => `
+    <div class="museum-item" id="mitem-${item.id}">
+      <div class="museum-date">${item.date}</div>
+      <div class="museum-text" id="mtext-${item.id}">${escapeHtml(item.text)}</div>
+      <button class="museum-release-btn" onclick="releaseMuseumItem(${item.id})">放つ</button>
+    </div>
+  `).join('');
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function releaseMuseumItem(id) {
+  const textEl = document.getElementById(`mtext-${id}`);
+  const itemEl = document.getElementById(`mitem-${id}`);
+  if (!textEl) return;
+
+  textEl.classList.add('releasing');
+
+  setTimeout(() => {
+    // 「---」に置き換え
+    textEl.textContent = '---';
+    textEl.style.color = 'var(--dim)';
+    textEl.classList.remove('releasing');
+
+    // データから削除フラグ
+    const museum = loadMuseum();
+    const updated = museum.map(item =>
+      item.id === id ? { ...item, released: true } : item
+    );
+    saveMuseum(updated);
+
+    // releaseボタンを消す
+    const btn = itemEl.querySelector('.museum-release-btn');
+    if (btn) btn.remove();
+  }, 1800);
+}
+
+document.getElementById('btnMuseumBack').addEventListener('click', () => {
+  showScreen('draft');
+});
+
+// ── Init ──
+applyLang();
+initEntrance();
+</script>
+</body>
+</html>
