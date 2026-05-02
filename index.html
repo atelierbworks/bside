@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>b-side v2.34</title>
+<title>b-side v2.35</title>
 <style>
 html {
   font-size: 18px;
@@ -637,7 +637,6 @@ textarea {
 <!-- Stillness -->
 <div class="screen" id="stillness">
   <div class="still-text" id="stillText"></div>
-  <p class="still-message" id="stillMsg">しばらく、見つめる。</p>
   <div class="progress-bar">
     <div class="progress-fill" id="progressFill"></div>
   </div>
@@ -691,7 +690,7 @@ textarea {
   <div class="museum-list" id="museumList"></div>
 </div>
 
-<span class="version">v2.34</span>
+<span class="version">v2.35</span>
 
 <script>
 const MUSEUM_KEY = 'bside_museum';
@@ -714,7 +713,6 @@ const LANG = {
     draftMsg: '誰にも見せない言葉を、ここに。',
     abort: '中断', abortSub: 'cancel',
     done: '書き終える', doneSub: 'done',
-    stillMsg: 'しばらく、見つめる。',
     close: '置く', closeSub: 'keep',
     share: '渡す', shareSub: 'share',
     release: '放つ', releaseSub: 'release',
@@ -737,7 +735,6 @@ const LANG = {
     draftMsg: 'Words you will show no one, here.',
     abort: 'Cancel', abortSub: '中断',
     done: 'Done', doneSub: '書き終える',
-    stillMsg: 'Look for a while.',
     close: 'Keep', closeSub: '置く',
     share: 'Share', shareSub: '渡す',
     release: 'Release', releaseSub: '放つ',
@@ -766,7 +763,6 @@ function applyLang() {
   set('draftMsg', L.draftMsg);
   set('lblAbort', L.abort); set('lblAbortSub', L.abortSub);
   set('lblDone', L.done); set('lblDoneSub', L.doneSub);
-  set('stillMsg', L.stillMsg);
   set('lblClose', L.close); set('lblCloseSub', L.closeSub);
   set('lblShare', L.share); set('lblShareSub', L.shareSub);
   set('lblRelease', L.release); set('lblReleaseSub', L.releaseSub);
