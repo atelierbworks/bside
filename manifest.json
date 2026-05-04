@@ -3,7 +3,7 @@
   "short_name": "b-side",
   "description": "言葉を置く場所。何も返さない。ただ、ここにある。",
   "start_url": "/bside/",
-  "display": "standalone",
+  "display": "browser",
   "background_color": "#1A1A18",
   "theme_color": "#1A1A18",
   "orientation": "portrait",
