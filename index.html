@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="theme-color" content="#1A1A18">
 <link rel="manifest" href="manifest.json">
-<title>b-side v2.36</title>
+<title>b-side v2.37</title>
 <style>
 html {
   font-size: 18px;
@@ -692,7 +692,7 @@ textarea {
   <div class="museum-list" id="museumList"></div>
 </div>
 
-<span class="version">v2.36</span>
+<span class="version">v2.37</span>
 
 <script>
 const MUSEUM_KEY = 'bside_museum';
@@ -1069,6 +1069,13 @@ history.pushState(null, '', location.href);
 window.addEventListener('popstate', () => {
   history.pushState(null, '', location.href);
 });
+
+// スプラッシュを長く見せるため、初期表示を遅らせる
+document.body.style.opacity = '0';
+setTimeout(() => {
+  document.body.style.transition = 'opacity 0.5s';
+  document.body.style.opacity = '1';
+}, 2500);
 </script>
 </body>
 </html>
